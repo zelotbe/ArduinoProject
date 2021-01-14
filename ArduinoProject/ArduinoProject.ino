@@ -1,6 +1,6 @@
 #include <Keypad.h> //Keypad Library
 #include <LiquidCrystal.h> //LCD library
-#include <EEPROM.h> //Library om data te onthouden wanneer de Arduino uitstaat
+#include <EEPROM.h> //Library om data te onthouden wanneer de Arduino uitstaat, momenteel niet gebruikt
 
 //ALLES VOOR HET TOETSENPANEEL
 const byte RIJ = 4;
@@ -12,7 +12,8 @@ char toetsen[RIJ][KOLOM] = {
   {'7', '8', '9', 'C'},
   {'*', '0', '#', 'D'}
 };
-byte rowPins[RIJ] = {A0, A1, A2, A3};
+//Pinnen definiëren voor de keypad
+byte rowPins[RIJ] = {A0, A1, A2, A3}; 
 byte colPins[KOLOM] = {A4, A5, 3, 2};
 
 //initialize an instance of class NewKeypad
@@ -20,7 +21,7 @@ Keypad paneel = Keypad( makeKeymap(toetsen), rowPins, colPins, RIJ, KOLOM);
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12); // Pinnen definiëren voor het LCD scherm
 char wachtwoord[] = {'1', '5', '9', '8', '0'};
-char input[5];
+char input[5]; //ingegeven wachtwoord door gebruiker
 int i = 0;
 int buzzer = 6;
 void setup() {
@@ -38,18 +39,18 @@ void loop() {
   wissen(ingedrukteToets);
 }
 
-void inputSamenvoegen(char ingedrukteToets) {
+void inputSamenvoegen(char ingedrukteToets) { //Input in een array steken & op het LCD scherm laten afprinten
   if (ingedrukteToets && ingedrukteToets != '*') {
     input[i++] = ingedrukteToets;
     delay(200);
     lcd.print(ingedrukteToets);
   }
 }
-void inloggen() {
+void inloggen() {//Ingegeven wachtwoord van gebruiker vergelijken met het juist wachtwoord
   int check;
   for (int z = 0; z < sizeof(wachtwoord); z++) {
-    check = memcmp(wachtwoord, input, sizeof(wachtwoord));
-    if (check == 0 && i == 5) {
+    check = memcmp(wachtwoord, input, sizeof(wachtwoord)); // Manier om eenvoudig arrays te vergelijken
+    if (check == 0 && i == 5) {//juist wachtwoord
       lcd.clear();
       tone(buzzer, 1600, 250);
       lcd.print("Welkom!");
@@ -57,7 +58,7 @@ void inloggen() {
       z = 0;
       break;
 
-    } else if (check != 0 && i == 5) {
+    } else if (check != 0 && i == 5) {//fout wachtwoord
       tone(buzzer, 400, 500);
       lcd.clear();
       lcd.write("Fout!");
@@ -72,7 +73,7 @@ void inloggen() {
     }
   }
 }
-void wissen(char ingedrukteToets) {
+void wissen(char ingedrukteToets) {//Input op het scherm wissen bij bv: een typfout, uitloggen en opnieuw code ingeven
   if (ingedrukteToets == '*') {
     lcd.clear();
     lcd.write("Pincode:");
